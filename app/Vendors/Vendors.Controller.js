@@ -18,6 +18,34 @@ class VendorsController {
       res.send(OutFailed(e, e.message));
     }
   }
+  async updateController(req, res) {
+    try {
+      const validate = VendorsValidation.updateValidation(req.body);
+      if (!validate.status)
+        return res.send(OutFailed(validate.data, validate.messages));
+
+      const response = await VendorsService.updateVendor(req.body);
+      if (!response.status)
+        return res.send(OutFailed(response.response, response.messages));
+      return res.send(OutSuccess(response.response, response.messages));
+    } catch (e) {
+      res.send(OutFailed(e, e.message));
+    }
+  }
+  async getOneController(req, res) {
+    try {
+      const response = await VendorsService.getOneVendor({
+        ...req.body,
+        ...req.decode,
+      });
+
+      if (!response.status)
+        return res.send(OutFailed(response.response, response.messages));
+      return res.send(OutSuccess(response.response, response.messages));
+    } catch (e) {
+      res.send(OutFailed(e, e.message));
+    }
+  }
 }
 
 module.exports = new VendorsController();

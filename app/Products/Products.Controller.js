@@ -10,7 +10,10 @@ class ProductsController {
       if (!validate.status)
         return res.send(OutFailed(validate.data, validate.messages));
 
-      const response = await ProductsService.listProductsService(req.query);
+      const response = await ProductsService.listProductsService({
+        ...req.query,
+        ...req.decode,
+      });
       if (!response.status)
         return res.send(OutFailed(response.response, response.messages));
 
@@ -70,7 +73,10 @@ class ProductsController {
       if (!validate.status)
         return res.send(OutFailed(validate.data, validate.messages));
 
-      const response = await ProductsService.deleteProductsService(req.query);
+      const response = await ProductsService.deleteProductsService({
+        ...req.query,
+        ...req.decode,
+      });
       if (!response.status)
         return res.send(OutFailed(response.response, response.messages));
 

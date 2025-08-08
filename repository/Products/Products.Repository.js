@@ -1,7 +1,7 @@
 const _ = require("../../config/DB");
 
 class ProductsRepository {
-  async getRepository({ search, size, page }) {
+  async getRepository({ search, size, page, vendor_id }) {
     try {
       const response = await _.select(
         _.raw("count(*) over() AS total_data"),
@@ -17,6 +17,9 @@ class ProductsRepository {
         .from("products as p")
         .join("vendors as v", "v.id", "p.vendor_id")
         .where((qb) => {
+          if (vendor_id) {
+            qb.where("p.vendor_id", vendor_id);
+          }
           if (search) {
             qb.where("p.name", "ilike", `%${search}%`).orWhere(
               "v.name",
@@ -43,6 +46,22 @@ class ProductsRepository {
       if (!response) return this.fail(null, "Products not found");
 
       return this.success(response, "Products fetched successfully");
+    } catch (e) {
+      return this.fail(e, e.message);
+    }
+  }
+  async getOmsetByVendorRepository(params) {
+    try {
+      const response = await _.select(
+        _.raw("coalesce(sum(price * stock), 0) as total")
+      )
+        .from("products")
+        .where(params)
+        .whereNull("deleted_at");
+
+      if (!response) return this.fail(null, "Products not found");
+
+      return this.success(response[0], "Products fetched successfully");
     } catch (e) {
       return this.fail(e, e.message);
     }

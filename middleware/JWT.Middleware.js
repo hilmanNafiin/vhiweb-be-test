@@ -1,9 +1,9 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 exports.JWTVerify = async (req, res, next) => {
   let token = req.headers.authorization;
   if (token) {
-    token = token.split(' ')[1];
+    token = token.split(" ")[1];
     if (token) {
       jwt.verify(token, process.env.JWT_SECRET, (e, decode) => {
         if (e) {
@@ -11,10 +11,12 @@ exports.JWTVerify = async (req, res, next) => {
             status: false,
             code: 203,
             data: "Sorry you don't have access to this server.",
-            messages: 'Sorry you must have verified access token this server',
+            messages: "Sorry you must have verified access token this server",
             key: null,
           });
         }
+        req.decode = decode;
+
         next();
       });
     } else {
@@ -22,7 +24,7 @@ exports.JWTVerify = async (req, res, next) => {
         status: false,
         code: 203,
         data: "Sorry you don't have access to this server.",
-        messages: 'Sorry you must have verified access token this server',
+        messages: "Sorry you must have verified access token this server",
         key: null,
       });
     }
@@ -31,7 +33,7 @@ exports.JWTVerify = async (req, res, next) => {
       status: false,
       code: 203,
       data: "Sorry you don't have access to this server.",
-      messages: 'Sorry you must have verified access token this server',
+      messages: "Sorry you must have verified access token this server",
       key: null,
     });
   }

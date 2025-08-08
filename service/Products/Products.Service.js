@@ -18,7 +18,26 @@ class ProductsService {
   async listProductsService(params) {
     try {
       const paginate = PaginationsGenerate(params);
-      return await ProductsRepository.getRepository(paginate);
+      const vendor = await VendorsRepository.getOneRepository({
+        user_id: params.id,
+        deleted_at: null,
+      });
+
+      if (!vendor.status)
+        return this.fail(null, "This vendor or account is unknow");
+      paginate.vendor_id = vendor.response.id;
+      const omset = await ProductsRepository.getOmsetByVendorRepository({
+        vendor_id: vendor.response.id,
+      });
+
+      const products = await ProductsRepository.getRepository(paginate);
+      return this.success(
+        {
+          products: products.response,
+          omset: omset.response.total,
+        },
+        "Products fetched successfully"
+      );
     } catch (e) {
       return this.fail(e, e.message);
     }
@@ -26,6 +45,7 @@ class ProductsService {
 
   async createProductsService(params) {
     try {
+      console.log(params);
       const vendor = await VendorsRepository.getOneRepository({
         id: params.vendor_id,
         user_id: params.user_id,
@@ -109,7 +129,7 @@ class ProductsService {
     try {
       // check account
       const account = await UsersRepository.getOneRepository({
-        id: params.user_id,
+        id: params.id,
         deleted_at: null,
       });
 
@@ -121,7 +141,7 @@ class ProductsService {
       if (!product.status) return this.success(null, "Product not found");
 
       await ProductsRepository.updateRepository(
-        { deleted_at: new Date(), deleted_by: params.user_id },
+        { deleted_at: new Date(), deleted_by: params.id },
         { id: params.product_id }
       ); // soft delete = update `deleted_at`
       return this.success(null, "Product deleted successfully");

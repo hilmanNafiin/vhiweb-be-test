@@ -20,10 +20,10 @@ class VendorsRepository {
       return this.fail(e, e.message);
     }
   }
-  async createRepository(params) {
+  async updateRepository(params, condition) {
     try {
-      const response = await _.insert(params).into("vendors");
-      if (response) return this.success(null, "Vendor created successfully");
+      const response = await _.update(params).from("vendors").where(condition);
+      if (response) return this.success(null, "Vendor Updated successfully");
 
       return this.fail(null, "Failed to create vendor");
     } catch (e) {

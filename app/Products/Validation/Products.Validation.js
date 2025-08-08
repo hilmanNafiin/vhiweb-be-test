@@ -58,7 +58,6 @@ exports.updateProductsValidation = (req) => {
 exports.deleteProductsValidation = (req) => {
   const schema = Joi.object({
     product_id: Joi.number().required(),
-    user_id: Joi.number().required(),
   });
   const validate = schema.validate(req);
   if (validate.error)
