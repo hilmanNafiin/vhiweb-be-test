@@ -2,6 +2,7 @@ const {
   UsersRepository,
   VendorsRepository,
   ImportJob,
+  TransactionsRepository,
 } = require("../../repository");
 const { Auth, AccountType } = require("../../enum");
 const {
@@ -26,10 +27,9 @@ class ProductsService {
       if (!vendor.status)
         return this.fail(null, "This vendor or account is unknow");
       paginate.vendor_id = vendor.response.id;
-      const omset = await ProductsRepository.getOmsetByVendorRepository({
+      const omset = await TransactionsRepository.getOmsetByProductIDRepository({
         vendor_id: vendor.response.id,
       });
-
       const products = await ProductsRepository.getRepository(paginate);
       return this.success(
         {
@@ -42,10 +42,18 @@ class ProductsService {
       return this.fail(e, e.message);
     }
   }
+  async listProductsUsersService(params) {
+    try {
+      const paginate = PaginationsGenerate(params);
+      const products = await ProductsRepository.getUsersRepository(paginate);
+      return products;
+    } catch (e) {
+      return this.fail(e, e.message);
+    }
+  }
 
   async createProductsService(params) {
     try {
-      console.log(params);
       const vendor = await VendorsRepository.getOneRepository({
         id: params.vendor_id,
         user_id: params.user_id,
@@ -70,13 +78,14 @@ class ProductsService {
       if (!params.bucket || !params.key) {
         throw new Error("Bucket and key are required.");
       }
-
+      console.log(params);
       const fileBuffer = await getFileFromS3(params.bucket, params.key);
       const jobId = uuids();
       await ImportJob.createRepository({
         id: jobId,
         filename: params.key,
         status: "processing",
+        vendor_id: params.vendor_id,
       });
       await Queues.add("product-import-queue", {
         buffer: fileBuffer.toString("utf-8"),

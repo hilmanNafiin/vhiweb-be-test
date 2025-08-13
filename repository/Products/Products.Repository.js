@@ -38,6 +38,40 @@ class ProductsRepository {
       return this.fail(e, e.message);
     }
   }
+  async getUsersRepository({ search, size, page }) {
+    try {
+      const response = await _.select(
+        _.raw("count(*) over() AS total_data"),
+        "p.id",
+        "v.name as vendor_name",
+        "p.vendor_id",
+        "p.name",
+        "p.description",
+        "p.price",
+        "p.stock",
+        "p.created_at"
+      )
+        .from("products as p")
+        .join("vendors as v", "v.id", "p.vendor_id")
+        .where((qb) => {
+          if (search) {
+            qb.where("p.name", "ilike", `%${search}%`).orWhere(
+              "v.name",
+              "ilike",
+              `%${search}%`
+            );
+          }
+        })
+        .whereNull("p.deleted_at")
+        .orderBy("p.created_at", "desc")
+        .limit(size)
+        .offset(page);
+
+      return this.success(response, "Products fetched successfully");
+    } catch (e) {
+      return this.fail(e, e.message);
+    }
+  }
 
   async getOneRepository(params) {
     try {
@@ -68,6 +102,7 @@ class ProductsRepository {
   }
 
   async createRepository(params) {
+    console.log(params);
     try {
       const result = await _.insert(params).into("products");
 

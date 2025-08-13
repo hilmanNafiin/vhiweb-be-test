@@ -22,6 +22,24 @@ class ProductsController {
       return res.send(OutFailed(e, e.message));
     }
   }
+  async listProductsUsersController(req, res) {
+    try {
+      const validate = ProductsValidation.listProductsValidation(req.query);
+      if (!validate.status)
+        return res.send(OutFailed(validate.data, validate.messages));
+
+      const response = await ProductsService.listProductsUsersService(
+        req.query
+      );
+      if (!response.status)
+        return res.send(OutFailed(response.response, response.messages));
+
+      return res.send(OutSuccess(response.response, response.messages));
+    } catch (e) {
+      console.log(e);
+      return res.send(OutFailed(e, e.message));
+    }
+  }
 
   async createProductsController(req, res) {
     try {
@@ -41,12 +59,16 @@ class ProductsController {
 
   async uploadProductsController(req, res) {
     try {
-      const response = await ProductsService.uploadProductsService(req.file);
+      const response = await ProductsService.uploadProductsService({
+        ...req.file,
+        ...req.body,
+      });
       if (!response.status)
         return res.send(OutFailed(response.response, response.messages));
 
       return res.send(OutSuccess(response.response, response.messages));
     } catch (e) {
+      console.log(e);
       return res.send(OutFailed(e, e.message));
     }
   }

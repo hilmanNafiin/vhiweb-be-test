@@ -3,7 +3,6 @@ const { JWT } = require("../../middleware");
 
 const router = express.Router();
 
-router.use("/users", require("./ProductsUsers.Router"));
-router.use("/", JWT.JWTVerify, require("./Products.Router"));
+router.use("/", require("./Transactions.Router"));
 
 module.exports = router;

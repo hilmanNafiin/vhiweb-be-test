@@ -87,6 +87,19 @@ AWSURL=https://your-storage-provider-url
 
 REDISHOST="redis://127.0.0.1:6379"
 
+# Midtrans
+
+MIDTRANS_MERCHANT_ID=your_merchant_id
+MIDTRANS_CLIENT=your_client_id
+MIDTRANS_SERVER=SB-your_server_key
+MIDTRANS_IS_PRODUCTION=false || true
+MIDTRANS_EXPIRE_DURATION=5 for example
+MIDTRANS_EXPIRE_UNIT=minute || hour for example
+
+# FONTE
+
+API_FONTE=your_token_fonte
+
 3. 🔧 Run Database Migrations
 
 Use any migration tools or manually run SQL scripts to create the following tables:

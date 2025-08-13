@@ -2,8 +2,10 @@ const multer = require("multer");
 const multerS3 = require("multer-s3");
 const AWS = require("aws-sdk");
 const { S3 } = require("@aws-sdk/client-s3");
+require("dotenv").config();
 
 exports.MulterBucket = (uniqueKeyFile) => {
+  console.log(process.env.AWSKEYID);
   const s3 = new S3({
     credentials: {
       accessKeyId: process.env.AWSKEYID,

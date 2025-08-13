@@ -2,16 +2,15 @@ const {
   OutParser: { OutSuccess, OutFailed },
 } = require("../../utils");
 const { VendorsValidation } = require("./Validation");
-const { VendorsService } = require("../../service");
-class VendorsController {
+const { TransactionsService } = require("../../service");
+class TransactionsController {
   async createController(req, res) {
     try {
-      console.log(req.body);
       const validate = VendorsValidation.createValidation(req.body);
       if (!validate.status)
         return res.send(OutFailed(validate.data, validate.messages));
 
-      const response = await VendorsService.createVendor(req.body);
+      const response = await TransactionsService.createTransactions(req.body);
       if (!response.status)
         return res.send(OutFailed(response.response, response.messages));
       return res.send(OutSuccess(response.response, response.messages));
@@ -19,13 +18,13 @@ class VendorsController {
       res.send(OutFailed(e, e.message));
     }
   }
-  async updateController(req, res) {
+  async getListController(req, res) {
     try {
-      const validate = VendorsValidation.updateValidation(req.body);
+      const validate = VendorsValidation.listValidation(req.query);
       if (!validate.status)
         return res.send(OutFailed(validate.data, validate.messages));
 
-      const response = await VendorsService.updateVendor(req.body);
+      const response = await TransactionsService.listTransactions(req.query);
       if (!response.status)
         return res.send(OutFailed(response.response, response.messages));
       return res.send(OutSuccess(response.response, response.messages));
@@ -33,13 +32,9 @@ class VendorsController {
       res.send(OutFailed(e, e.message));
     }
   }
-  async getOneController(req, res) {
+  async callbackController(req, res) {
     try {
-      const response = await VendorsService.getOneVendor({
-        ...req.body,
-        ...req.decode,
-      });
-
+      const response = await TransactionsService.callbackTransactions(req.body);
       if (!response.status)
         return res.send(OutFailed(response.response, response.messages));
       return res.send(OutSuccess(response.response, response.messages));
@@ -49,4 +44,4 @@ class VendorsController {
   }
 }
 
-module.exports = new VendorsController();
+module.exports = new TransactionsController();
